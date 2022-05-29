@@ -21,7 +21,6 @@ def create_word_file(no_of_ltr):
     #to create unique file name for each set of words with specific length
     file_name = "dict_no_ltr-"+ no_of_ltr +".txt"
 
-    #new file is created(NOTE: idealy should have condition to not replace/replicate once created)
     #NOTE 2: file name can be defined outside function or should be returned such that other functions can use the name.
     with open(file_name,'w+', encoding='utf-8') as words:
 
@@ -32,25 +31,9 @@ def create_word_file(no_of_ltr):
 
     return file_name
 
-    #divides the number of words into 5 in order of commonality.
-def word_difficulty(common_words, dif_lvl):
-    words_per_lvl = int(len(common_words)/5)
-
-    #gives range of words from most difficult to the easiest.
-    count=1#to count which level for loop is on
-    for lvl in range(5):
-        lst_dif = common_words[lvl:(lvl+1)*words_per_lvl]
-
-        if count == dif_lvl:
-            return list(lst_dif)
-        else:
-            count +=1
-
 
 
 #to pick a random word from word file
-#figure out how to get the program to only pick out common words
-
 def pick_word(file_name,dif_lvl):
     global  wordle_word
 
@@ -60,19 +43,12 @@ def pick_word(file_name,dif_lvl):
 
         lst_words = words.read().splitlines()
 
-    #create a new list in order of common words from original list
-    lst_words = Counter(lst_words)#makes the list readable by the module
-    common_words = lst_words.most_common()
-
-    #gets set of words according to the level inputted
-    lst_dif=word_difficulty(common_words, dif_lvl)
 
     #to pick a random number in the range of 0 to total words with required lenght
-    random_num = random.randint(0, len(lst_dif))
+    random_num = random.randint(0, len(lst_words))
 
     #word to guess-
-    wordle_word = lst_dif[random_num]
-    wordle_word = wordle_word[0]#to assign value to variable as a string
+    wordle_word = lst_words[random_num]
 
     return wordle_word
 
@@ -84,7 +60,6 @@ def pick_word(file_name,dif_lvl):
 def hints(guess_word,wordle_word):
     hint_lst=[]
     for letter in guess_word:
-        print(len(hint_lst))
         #for green entry(i.e when the letter is in the correct position and value)
         if letter == wordle_word[len(hint_lst)]:
             hint_lst.append(1)
@@ -101,23 +76,18 @@ def hints(guess_word,wordle_word):
 
 
 
-
-
-
-
-
-
-
-
-
-
 #inputs
+#no_of_ltr - number of letters in the word
+#guess_word - word guessed by user
+
+
+
+'''
 no_of_ltr = '5'
-dif_lvl = 1
 guess_word = "alter"
 create_word_file(no_of_ltr)
 print(pick_word(file_name,dif_lvl))
 
-#wordle_word = "alter"
 hint_lst = hints(guess_word,wordle_word)
 print(hint_lst)
+'''
