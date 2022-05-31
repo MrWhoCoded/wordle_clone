@@ -4,8 +4,6 @@
 #to get list of words from a dictionary of english words from json file.
 #dictionary key/value pair is in the form word/meaning.
 import json
-from difflib import get_close_matches
-from collections import Counter#to get common words
 import random
 
 #NOTE: can add meanings also as a clue....maybe
@@ -16,10 +14,10 @@ def create_word_file(no_of_ltr):
     global file_name, num_words
 
     #to extract data from file.
-    all_words = json.load(open("D:\python_my programs\dictionary_of_words.json", "r"))
+    all_words = json.load(open("dictionary_of_words.json", "r"))
 
     #to create unique file name for each set of words with specific length
-    file_name = "dict_no_ltr-"+ no_of_ltr +".txt"
+    file_name = "dict_no_ltr-"+ str(no_of_ltr) +".txt"
 
     #NOTE 2: file name can be defined outside function or should be returned such that other functions can use the name.
     with open(file_name,'w+', encoding='utf-8') as words:
@@ -29,12 +27,10 @@ def create_word_file(no_of_ltr):
             if (len(i)) == int(no_of_ltr):
                 words.write(i+'\n')
 
-    return file_name
-
 
 
 #to pick a random word from word file
-def pick_word(file_name,dif_lvl):
+def pick_word(file_name):
     global  wordle_word
 
 
