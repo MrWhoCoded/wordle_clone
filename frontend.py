@@ -33,10 +33,10 @@ def attempt_verify():
 def entry_disable(row):
     global counter
     counter = 0
-    if (row[-1]+1) <= 6:
+    if (row[-1]+1) <= no_of_words.get() + 1:
         for x in range(1, (row[-1]+1)):
             counter+=1
-            for y in range(1, 6):
+            for y in range(1, no_of_words.get() + 1):
                 attempt_box = Entry(game_window, justify = CENTER, font=('Arial bold',17), width = 3)
                 attempt_box.grid(row = x, column = y, padx = 2, pady = 2)
                 attempt_box.insert(0, attempt_word[y - 1])
@@ -76,7 +76,7 @@ def start_window():
 
     no_of_words = IntVar()
     no_of_words_choosen = ttk.Combobox(window, width = 10, textvariable = no_of_words)
-    no_of_words_choosen["values"] = tuple([i for i in range(4, 12, 1)])
+    no_of_words_choosen["values"] = tuple([i for i in range(4, 8, 1)])
     no_of_words_choosen.grid(row = 3, column = 3)
     no_of_words_choosen.current()
 
@@ -97,19 +97,20 @@ def start_window():
 def _game_window():
     
     global entries, attempt_box, game_window, attempt
+
+    #print(no_of_words.get())
     
     entries = []
 
     game_window = Tk()
     game_window.title("Wordle")
-    
     game_window.geometry("310x250")
     
-    header = Label(game_window, text = "You have 5 attempts!", width = 16, font=('Arial',14))
+    header = Label(game_window, text = "You have {} attempts!".format(no_of_words.get()), width = 16, font = ('Arial',14))
     header.grid(row = 0, column = 2, pady = 5, columnspan = 4)
     
-    for x in range(1, 6):
-        for y in range(1, 6):
+    for x in range(1, no_of_words.get() + 1):
+        for y in range(1, no_of_words.get() + 1):
             attempt = StringVar()
             attempt_box = Entry(game_window, textvar = attempt, justify = CENTER, font=('Helvatical bold',17), width = 3)
             attempt_box.grid(row = x, column = y, padx = 2, pady = 2)
@@ -117,10 +118,10 @@ def _game_window():
     
     
     give_up_button = Button(game_window, text = "Give up", width = 7, font = ('Arial',13), command = give_up)
-    give_up_button.grid(row = 7, column = 4, padx = 2, pady = 7, columnspan = 2)
+    give_up_button.grid(row = 7 + (no_of_words.get() - 2), column = 4 + (no_of_words.get() - 5), padx = 2, pady = 7, columnspan = 2)
     
     attempt_button = Button(game_window, text = "attempt", width = 7, font = ('Arial',13), command = attempt_verify)
-    attempt_button.grid(row = 7, column = 1, padx = 2, pady = 7, columnspan = 2)
+    attempt_button.grid(row = 7 + (no_of_words.get() - 2), column = 1 + (no_of_words.get() - 5), padx = 2, pady = 7, columnspan = 2)
     
     dummy1 = Label(game_window, text = "           ")
     dummy1.grid(row = 0, column = 0)
