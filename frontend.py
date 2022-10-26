@@ -1,6 +1,9 @@
 from tkinter import *
 from tkinter import ttk
+import csv
 import wordle_automation
+
+complete_attempt_word = ""
 
 def window_switcher():
     global row, attempt_word, wordle_word
@@ -13,33 +16,34 @@ def window_switcher():
     _game_window()
 
 def attempt_cleaner():
-    global attempt_word
-    attempt_word = ""
+    global attempt_word, entries, complete_attempt_word
+    complete_attempt_word = ""
     for entry in entries:
-        if entry.get() != "":
-            attempt_word += entry.get().lower()
-    #print("HERE")
+        if len(entry.get()) != 0:
+            complete_attempt_word += entry.get().lower()
+    attempt_word =  complete_attempt_word.strip(attempt_word)
+    print(attempt_word)
+    print(complete_attempt_word)
     
 def attempt_verify():
-    global attempt_word, hint
+    global attempt_word, hint, entries
     attempt_cleaner()
     
     hint = wordle_automation.hints(attempt_word, wordle_word)
     print(hint)
     
     entry_disable(row)
-    attempt_word = ""
+    
                     
 def entry_disable(row):
-    global counter
+    global complete_attempt_word
     counter = 0
-    if (row[-1]+1) <= no_of_words.get() + 1:
+    if (row[-1]+1) <= no_of_words.get() + 1:    
         for x in range(1, (row[-1]+1)):
-            counter+=1
             for y in range(1, no_of_words.get() + 1):
                 attempt_box = Entry(game_window, justify = CENTER, font=('Arial bold',17), width = 3)
                 attempt_box.grid(row = x, column = y, padx = 2, pady = 2)
-                attempt_box.insert(0, attempt_word[y - 1])
+                attempt_box.insert(0, complete_attempt_word[y - 1])
                 #attempt_box_color()
                 flag = int(hint[y - 1])
                 if flag == 1:
@@ -50,9 +54,15 @@ def entry_disable(row):
                     attempt_box.config(disabledbackground = "grey")
                     
                 attempt_box.config(state = DISABLED)
-    #if counter <= 6:
-    #    counter = 0                     
+    counter += 1                   
     row.append((row[-1]+1))
+    
+def disable_all():
+    for x in range(1, no_of_words.get() + 1):
+        for y in range(1, no_of_words.get() + 1):
+            attempt_box = Entry(game_window, textvar = attempt, justify = CENTER, font=('Helvatical bold',17), width = 3)
+            attempt_box.grid(row = x, column = y, padx = 2, pady = 2)
+            attempt_box.config(disabledbackground = "grey")
                        
 def give_up():
     quit()
@@ -65,6 +75,9 @@ def start_window():
 
     window.title("Wordle")
     window.geometry("250x180")
+    
+    photo = PhotoImage(file = "Wordle_2021_Icon.png")
+    window.iconphoto(False, photo)
 
     wordle_label = Label(window, text = "Wordle")
     wordle_label.grid(row = 1, column = 3)
@@ -101,10 +114,25 @@ def _game_window():
     #print(no_of_words.get())
     
     entries = []
+    width = None #+ (no_of_words.get() * 10)
+    height = None #+ (no_of_words.get() * 10)
+    high_score  = None
+    
+    with open("geometry.csv", "r") as file:
+        dimensions = list(csv.reader(file))
+        
+        width = dimensions[no_of_words.get() - 3][0]
+        height = dimensions[no_of_words.get() - 3][1]
+        
+    with open("games_won.txt", "r") as file:
+        high_score = file.read()
 
     game_window = Tk()
     game_window.title("Wordle")
-    game_window.geometry("310x250")
+    game_window.geometry("{}x{}".format(width, height))
+    
+    photo = PhotoImage(file = "Wordle_2021_Icon.png")
+    game_window.iconphoto(False, photo)
     
     header = Label(game_window, text = "You have {} attempts!".format(no_of_words.get()), width = 16, font = ('Arial',14))
     header.grid(row = 0, column = 2, pady = 5, columnspan = 4)
@@ -118,10 +146,13 @@ def _game_window():
     
     
     give_up_button = Button(game_window, text = "Give up", width = 7, font = ('Arial',13), command = give_up)
-    give_up_button.grid(row = 7 + (no_of_words.get() - 2), column = 4 + (no_of_words.get() - 5), padx = 2, pady = 7, columnspan = 2)
+    give_up_button.grid(row = 7 + (no_of_words.get() - 2), column = no_of_words.get() - 1, padx = 2, pady = 1, columnspan = 2)
     
     attempt_button = Button(game_window, text = "attempt", width = 7, font = ('Arial',13), command = attempt_verify)
-    attempt_button.grid(row = 7 + (no_of_words.get() - 2), column = 1 + (no_of_words.get() - 5), padx = 2, pady = 7, columnspan = 2)
+    attempt_button.grid(row = 7 + (no_of_words.get() - 2), column = 1, padx = 2, pady = 1, columnspan = 2)
+    
+    games_won = Label(game_window, text = "games won:{}".format(high_score), font = ('Arial',12))
+    games_won.grid(row = 8 + (no_of_words.get() - 2), column = 1, padx = 2, pady = 1, columnspan = 2)
     
     dummy1 = Label(game_window, text = "           ")
     dummy1.grid(row = 0, column = 0)
