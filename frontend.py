@@ -4,6 +4,9 @@ import csv
 import wordle_automation
 
 complete_attempt_word = ""
+hints = []
+counter = 0
+attempt_words = []
 
 def window_switcher():
     global row, attempt_word, wordle_word
@@ -16,45 +19,50 @@ def window_switcher():
     _game_window()
 
 def attempt_cleaner():
-    global attempt_word, entries, complete_attempt_word
+    global attempt_word, entries, attempt_words
     complete_attempt_word = ""
     for entry in entries:
         if len(entry.get()) != 0:
             complete_attempt_word += entry.get().lower()
-    attempt_word =  complete_attempt_word.strip(attempt_word)
+    attempt_word = complete_attempt_word.strip(attempt_word)
+    attempt_words.append(attempt_word)
     print(attempt_word)
-    print(complete_attempt_word)
+    print(attempt_words)
     
 def attempt_verify():
-    global attempt_word, hint, entries
+    global attempt_word, hints, entries
     attempt_cleaner()
     
     hint = wordle_automation.hints(attempt_word, wordle_word)
+    hints.extend(hint)
+    print(hints)
     print(hint)
     
     entry_disable(row)
     
                     
 def entry_disable(row):
-    global complete_attempt_word
-    counter = 0
+    global complete_attempt_word, counter
+    print(counter)
     if (row[-1]+1) <= no_of_words.get() + 1:    
         for x in range(1, (row[-1]+1)):
             for y in range(1, no_of_words.get() + 1):
                 attempt_box = Entry(game_window, justify = CENTER, font=('Arial bold',17), width = 3)
                 attempt_box.grid(row = x, column = y, padx = 2, pady = 2)
-                attempt_box.insert(0, complete_attempt_word[y - 1])
+                for i in range(len(attempt_words))
+                attempt_box.insert(0, attempt_words[][(counter * 4) + (y - 1)])
+                #attempt_box.insert(0, complete_attempt_word[((counter * 4) + y) - 1])
                 #attempt_box_color()
-                flag = int(hint[y - 1])
-                if flag == 1:
-                    attempt_box.config(disabledbackground = "#67CB00")
-                elif flag == -1:
-                    attempt_box.config(disabledbackground = "#FFEB00")
-                elif flag == 0:
-                    attempt_box.config(disabledbackground = "grey")
+                #flag = int(hints[y - 1])
+                #if flag == 1:
+                #    attempt_box.config(disabledbackground = "#67CB00")
+                #elif flag == -1:
+                #    attempt_box.config(disabledbackground = "#FFEB00")
+                #elif flag == 0:
+                #    attempt_box.config(disabledbackground = "grey")
                     
-                attempt_box.config(state = DISABLED)
-    counter += 1                   
+                #attempt_box.config(state = DISABLED)
+    counter += 4                   
     row.append((row[-1]+1))
     
 def disable_all():
