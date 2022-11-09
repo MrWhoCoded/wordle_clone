@@ -1,36 +1,28 @@
 
 from pytrends.request import TrendReq
-import time
-"""
-pytrends = TrendReq(hl='en-US', tz=360) 
+import time,csv
 
-kw_list = ["slurp"] # list of keywords to get data 
 
-pytrends.build_payload(kw_list, cat=0, timeframe='today 12-m') 
-data = pytrends.interest_over_time() 
-#data = data.reset_index() 
-print(type(data))
+#opening file with words
+with open("dictionary_of_words_cleaned.txt", "wb") as words_dict:
+   
+    #to establish the connection between pytrends and google trends.
+    pytrends = TrendReq(hl='en-US', tz=360) 
+
+    #list of keywords to get data 
+    lst_words = list(words_dict.keys())
+    
+    #building payload which will be queried to google trends.(queries all words through the list)
+    pytrends.build_payload(lst_words,timeframe='today 12-m') 
+  
+    #sending request to google trends
+    data = pytrends.interest_over_time()
+    
+    #dont understand reset index - to be checked later.
+    data = data.reset_index() 
+    
+    
+    
 print(data)
-time.sleep(30)"""
 
-#install pytrends
 
-#import the libraries
-import pandas as pd                        
-from pytrends.request import TrendReq
-
-#create model
-pytrend = TrendReq()
-
-#provide your search terms
-kw_list=['Facebook', 'Apple', 'Amazon', 'Netflix', 'Google']
-
-#get interest by region for your search terms
-pytrend.build_payload(kw_list=kw_list)
-df = pytrend.interest_by_region(inc_low_vol=True, inc_geo_code=True)
-print(df)
-print("------------------")
-print(df.iloc[102])
-#print(df.loc[df["geoName"] == "India"])
-time.sleep(10)
-df.to_csv('data.csv')

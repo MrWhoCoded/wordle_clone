@@ -1,6 +1,7 @@
 import json,pickle
 
 #to extract data from file.
+all_words_cleaned ={}
 all_words = json.load(open("dictionary_of_words.json", "r"))
 all_words_items = all_words.items()#to prevent due to changing dictionary size during iteration.(?)
 
@@ -11,14 +12,15 @@ for word,meaning in all_words_items:
         pass
     if not word.isspace():
         pass
-    if not word.isapha()
+    if not word.isalpha():
         pass
     else:          
-        del all_words[(word,meaning)]#removes the defective nested list from main list. 
+        all_words_cleaned[word]=meaning 
 
 
+#rewriting edition dictionary in a new binary file.
 with open("dictionary_of_words_cleaned.txt", "wb") as new_dict:
-         pickle.dump(all_words,new_dict)
+         pickle.dump(all_words_cleaned,new_dict)
 
-
+print(all_words_cleaned)
 print("end of program")
