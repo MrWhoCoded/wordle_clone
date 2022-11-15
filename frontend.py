@@ -22,15 +22,17 @@ def window_switcher():
 
 def attempt_cleaner():
     global attempt_word, entries, attempt_words, complete_attempt_words, complete_attempt_word
+    complete_attempt_word = ""
     for entry in entries:
         if len(entry.get()) != 0:
             complete_attempt_word += entry.get().lower()
-    attempt_word = complete_attempt_word.strip(attempt_word)
+    attempt_word = complete_attempt_word[-(no_of_words.get()):]
     attempt_words = list(attempt_word)
     complete_attempt_words.append(attempt_word)
     print(attempt_word)
     print(attempt_words)
     print(complete_attempt_words)
+    print(complete_attempt_word)
     
 def attempt_verify():
     global attempt_word, hints, entries
@@ -47,8 +49,23 @@ def attempt_verify():
 def entry_disable(row):
     global complete_attempt_word, counter
     #print(counter)
-    if (row[-1]+1) <= no_of_words.get() + 1:    
-        for x in range(1, (row[-1]+1)):
+    if set(hints[-1]) == {1}:
+        print("you won")
+        disable_hint_list = [0, 0, 0, 0, 0]
+        disable_words = " " * no_of_words.get()
+        attempt_no = len(hints)
+        for i in range(no_of_words.get() - attempt_no):
+            hints.append(disable_hint_list)
+            complete_attempt_words.append(disable_words)
+        print(hints)
+        print(complete_attempt_words)
+        
+        with open("games_won.txt", "r+") as file:
+            content = file.read()
+            file.truncate(0)
+            file.write(str(int(content) + 1))
+        
+        for x in range(1, no_of_words.get() + 1):
             for y in range(1, no_of_words.get() + 1):
                 attempt_box = Entry(game_window, justify = CENTER, font=('Arial bold',17), width = 3)
                 attempt_box.grid(row = x, column = y, padx = 2, pady = 2)
@@ -61,18 +78,31 @@ def entry_disable(row):
                 elif flag == -1:
                     attempt_box.config(disabledbackground = "#FFEB00")
                 elif flag == 0:
-                   attempt_box.config(disabledbackground = "grey")
-                   
+                    attempt_box.config(disabledbackground = "grey")
+                
                 attempt_box.config(state = DISABLED)
+                
+    else: 
+        if (row[-1]+1) < no_of_words.get() + 1:    
+            for x in range(1, (row[-1]+1)):
+                for y in range(1, no_of_words.get() + 1):
+                    attempt_box = Entry(game_window, justify = CENTER, font=('Arial bold',17), width = 3)
+                    attempt_box.grid(row = x, column = y, padx = 2, pady = 2)
+                    attempt_box.insert(0 ,complete_attempt_words[x - 1][y - 1])
+                    #attempt_box.insert(0, complete_attempt_word[((counter * 4) + y) - 1])
+                    #attempt_box_color()
+                    flag = int(hints[x - 1][y - 1])
+                    if flag == 1:
+                        attempt_box.config(disabledbackground = "#67CB00")
+                    elif flag == -1:
+                        attempt_box.config(disabledbackground = "#FFEB00")
+                    elif flag == 0:
+                        attempt_box.config(disabledbackground = "grey")
+                    
+                    attempt_box.config(state = DISABLED)
+        
     counter += 4                   
     row.append((row[-1]+1))
-    
-def disable_all():
-    for x in range(1, no_of_words.get() + 1):
-        for y in range(1, no_of_words.get() + 1):
-            attempt_box = Entry(game_window, textvar = attempt, justify = CENTER, font=('Helvatical bold',17), width = 3)
-            attempt_box.grid(row = x, column = y, padx = 2, pady = 2)
-            attempt_box.config(disabledbackground = "grey")
                        
 def give_up():
     quit()
@@ -119,7 +149,7 @@ def start_window():
 
 def _game_window():
     
-    global entries, attempt_box, game_window, attempt
+    global entries, attempt_box, game_window, attempt, games_won
 
     #print(no_of_words.get())
     
@@ -135,7 +165,8 @@ def _game_window():
         height = dimensions[no_of_words.get() - 3][1]
         
     with open("games_won.txt", "r") as file:
-        high_score = file.read()
+        content = file.read()
+        high_score = "".join(content.split())
 
     game_window = Tk()
     game_window.title("Wordle")
@@ -162,7 +193,7 @@ def _game_window():
     attempt_button.grid(row = 7 + (no_of_words.get() - 2), column = 1, padx = 2, pady = 1, columnspan = 2)
     
     games_won = Label(game_window, text = "games won:{}".format(high_score), font = ('Arial',12))
-    games_won.grid(row = 8 + (no_of_words.get() - 2), column = 1, padx = 2, pady = 1, columnspan = 2)
+    games_won.grid(row = 8 + (no_of_words.get() - 2), column = 1, padx = 2, pady = 1, columnspan = 3)
     
     dummy1 = Label(game_window, text = "           ")
     dummy1.grid(row = 0, column = 0)
