@@ -29,10 +29,6 @@ def attempt_cleaner():
     attempt_word = complete_attempt_word[-(no_of_words.get()):]
     attempt_words = list(attempt_word)
     complete_attempt_words.append(attempt_word)
-    print(attempt_word)
-    print(attempt_words)
-    print(complete_attempt_words)
-    print(complete_attempt_word)
     
 def attempt_verify():
     global attempt_word, hints, entries
@@ -40,15 +36,12 @@ def attempt_verify():
     
     hint = wordle_automation.hints(attempt_word, wordle_word)
     hints.append(hint)
-    print(hints)
-    print(hint)
     
     entry_disable(row)
     
                     
 def entry_disable(row):
     global complete_attempt_word, counter
-    #print(counter)
     if set(hints[-1]) == {1}:
         print("you won")
         disable_hint_list = [0, 0, 0, 0, 0]
@@ -57,8 +50,6 @@ def entry_disable(row):
         for i in range(no_of_words.get() - attempt_no):
             hints.append(disable_hint_list)
             complete_attempt_words.append(disable_words)
-        print(hints)
-        print(complete_attempt_words)
         
         with open("games_won.txt", "r+") as file:
             content = file.read()
@@ -70,8 +61,6 @@ def entry_disable(row):
                 attempt_box = Entry(game_window, justify = CENTER, font=('Arial bold',17), width = 3)
                 attempt_box.grid(row = x, column = y, padx = 2, pady = 2)
                 attempt_box.insert(0 ,complete_attempt_words[x - 1][y - 1])
-                #attempt_box.insert(0, complete_attempt_word[((counter * 4) + y) - 1])
-                #attempt_box_color()
                 flag = int(hints[x - 1][y - 1])
                 if flag == 1:
                     attempt_box.config(disabledbackground = "#67CB00")
@@ -89,8 +78,6 @@ def entry_disable(row):
                     attempt_box = Entry(game_window, justify = CENTER, font=('Arial bold',17), width = 3)
                     attempt_box.grid(row = x, column = y, padx = 2, pady = 2)
                     attempt_box.insert(0 ,complete_attempt_words[x - 1][y - 1])
-                    #attempt_box.insert(0, complete_attempt_word[((counter * 4) + y) - 1])
-                    #attempt_box_color()
                     flag = int(hints[x - 1][y - 1])
                     if flag == 1:
                         attempt_box.config(disabledbackground = "#67CB00")
@@ -103,13 +90,47 @@ def entry_disable(row):
         
     counter += 4                   
     row.append((row[-1]+1))
-                       
+
 def give_up():
     quit()
+    
+def play_again():
+    start_window()
+    
+def game_over():
+    
+    game_over_window = Tk()
+    
+    game_over_window.geometry("180x160")
+    
+    dummy4 = Label(game_over_window, text = "     ")
+    dummy4.grid(row = 0, column = 0)
+    
+    dummy5 = Label(game_over_window, text = "     ")
+    dummy5.grid(row = 1, column = 1)
+    
+    lost = Label(game_over_window, text = "YOU LOST!", font = ('Arial', 12, "bold"))
+    lost.grid(row = 2, column = 2)
+    
+    play_again_button = Button(game_over_window, text = "Play again", command = play_again)
+    play_again_button.grid(row = 3, column = 2)
+    
+    quit_button = Button(game_over_window, text = "quit", command = give_up)
+    quit_button.grid(row = 4, column = 2)
+    
+    game_over_window.mainloop()
+    
+    
+game_over()
 
 def start_window():
 
-    global window, no_of_words
+    global window, no_of_words, complete_attempt_word, hints, counter, attempt_words
+    
+    complete_attempt_word = ""
+    hints = []
+    counter = 0
+    attempt_words = []
     
     window = Tk()
 
@@ -207,3 +228,11 @@ def _game_window():
     game_window.mainloop()
     
 start_window()
+
+def game_over():
+    
+    game_over_window = Tk()
+    
+    lost = Label(game_over_window, text = "YOU LOST!", font = ('Arial',15))
+    
+    game_over_window.mainloop()
