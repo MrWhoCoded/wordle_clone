@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 import csv
 import wordle_automation
+import os, sys
 
 complete_attempt_word = ""
 hints = []
@@ -26,9 +27,9 @@ def attempt_cleaner():
     for entry in entries:
         if len(entry.get()) != 0:
             complete_attempt_word += entry.get().lower()
-    attempt_word = complete_attempt_word[-(no_of_words.get()):]
-    attempt_words = list(attempt_word)
-    complete_attempt_words.append(attempt_word)
+            attempt_word = complete_attempt_word[-(no_of_words.get()):]
+            attempt_words = list(attempt_word)
+            complete_attempt_words.append(attempt_word)
     
 def attempt_verify():
     global attempt_word, hints, entries
@@ -87,7 +88,10 @@ def entry_disable(row):
                         attempt_box.config(disabledbackground = "grey")
                     
                     attempt_box.config(state = DISABLED)
-        
+        else:
+            game_window.quit()
+            return game_over()
+            
     counter += 4                   
     row.append((row[-1]+1))
 
@@ -95,7 +99,7 @@ def give_up():
     quit()
     
 def play_again():
-    start_window()
+    os.execv(sys.executable, ['python'] + sys.argv)
     
 def game_over():
     
@@ -119,9 +123,6 @@ def game_over():
     quit_button.grid(row = 4, column = 2)
     
     game_over_window.mainloop()
-    
-    
-game_over()
 
 def start_window():
 
@@ -207,7 +208,7 @@ def _game_window():
             entries.append(attempt_box)
     
     
-    give_up_button = Button(game_window, text = "Give up", width = 7, font = ('Arial',13), command = give_up)
+    give_up_button = Button(game_window, text = "Quit", width = 7, font = ('Arial',13), command = give_up)
     give_up_button.grid(row = 7 + (no_of_words.get() - 2), column = no_of_words.get() - 1, padx = 2, pady = 1, columnspan = 2)
     
     attempt_button = Button(game_window, text = "attempt", width = 7, font = ('Arial',13), command = attempt_verify)
@@ -228,11 +229,3 @@ def _game_window():
     game_window.mainloop()
     
 start_window()
-
-def game_over():
-    
-    game_over_window = Tk()
-    
-    lost = Label(game_over_window, text = "YOU LOST!", font = ('Arial',15))
-    
-    game_over_window.mainloop()
