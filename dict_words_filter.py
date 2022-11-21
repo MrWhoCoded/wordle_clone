@@ -28,19 +28,21 @@ print("end of program")
 #--------------------------------------------------------------------------------------------
 #to segregate the words in the dictionary based on number of letters.
 
+while True :
+    no_of_ltr = str(input("enter the number of letter of the words =>"))
+    #to create unique file name for each set of words with specific length
+    file_name = str(no_of_ltr)+"letter words.txt"
 
-#to create unique file name for each set of words with specific length
-file_name = str(no_of_ltr)+"letter words.txt"
+    #NOTE 2: file name can be defined outside function or should be returned such that other functions can use the name.
+    with open(file_name,'w+', encoding='utf-8') as words:
 
-#NOTE 2: file name can be defined outside function or should be returned such that other functions can use the name.
-with open(file_name,'w+', encoding='utf-8') as words:
-
-    #adding words of required length into new list
-    for i in all_words.keys():
-        if (len(i)) == int(no_of_ltr):
-            words.write(i+'\n')
+        #adding words of required length into new list
+        for i in all_words_cleaned.keys():
+            if (len(i)) == int(no_of_ltr):
+                words.write(i+'\n')
 
 
+quit()
 #-----------------------------------------------------------------------------------------
 
 #to establish the connection between pytrends and google trends.
