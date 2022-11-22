@@ -1,6 +1,9 @@
 from pytrends.request import TrendReq
 import time,csv
+import pandas as pd
 
+
+dummmy_dict = {}
 #to send api request to google trends api to find the frequency of word usage.
 for no_of_ltr in range(4,8):
     
@@ -28,11 +31,21 @@ for no_of_ltr in range(4,8):
             
         #sending request to google trends
         data = pytrends.interest_over_time()
+        
+        time.sleep(5)
 
         #dont understand reset index - to be checked later.
         data = data.reset_index() 
         
-        print(data)
-                
-            
+        dataframe = pd.DataFrame(data)
+        #print(dataframe.iloc[:, 1])
+        print(dataframe.iloc[:, 1].mean())
+        print(dataframe.iloc[:, 1].name)
+        
+        dummmy_dict[dataframe.iloc[:, 1].name] = dataframe.iloc[:, 1].mean()
+        
+        
+        #print("ran")
+
+print(dummmy_dict)        
                              
