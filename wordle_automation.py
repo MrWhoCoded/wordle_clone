@@ -10,34 +10,47 @@ import random
 
 
 #to get file of words(NOTE: should be under condition)
-def create_word_file(no_of_ltr):
+def open_word_file(no_of_ltr,dif_lvl):
     global file_name, num_words
 
     #to extract data from file.
     all_words = json.load(open("dictionary_of_words.json", "r"))
 
-    #to create unique file name for each set of words with specific length
-    file_name = "dict_no_ltr-"+ str(no_of_ltr) +".txt"
+    #obtaining file name of required file created in the previous program.
+    file_name = str(no_of_ltr)+"letter words.txt"
 
-    #NOTE 2: file name can be defined outside function or should be returned such that other functions can use the name.
-    with open(file_name,'w+', encoding='utf-8') as words:
+    if dif_lvl == "easy" : #easy word
+        file = open("easy_" + file_name, "r")
+        print("e")
+            
+    if dif_lvl == "medium" : #medium word
+        file = open("medium_" + file_name, "r")
+        print("m")
+    
+    if dif_lvl == "hard" : #hard word
+        file = open("hard_" + file_name, "r")
+        print("h")
 
-        #adding words of required length into new list
-        for i in all_words.keys():
-            if (len(i)) == int(no_of_ltr):
-                words.write(i+'\n')
+
+    return file
+
+    
+            
+
+
+
 
 
 
 #to pick a random word from word file
-def pick_word(file_name):
+def pick_word(file):
     global  wordle_word, common_words
 
 
-    with open(file_name, 'r', encoding='utf-8') as words:
-        #global wordle_word, common_words
+    #with open(file_name, 'r', encoding='utf-8') as words:
+    #global wordle_word, common_words
 
-        lst_words = words.read().splitlines()
+    lst_words = file.readlines()
 
 
     #to pick a random number in the range of 0 to total words with required lenght
@@ -45,6 +58,7 @@ def pick_word(file_name):
     #word to guess-
     wordle_word = lst_words[random_num].lower()
 
+    file.close()
     return wordle_word
 
 #coding for hints
@@ -78,12 +92,13 @@ def hints(guess_word,wordle_word):
 
 
 
-'''
-no_of_ltr = '5'
+no_of_ltr = '7'
 guess_word = "alter"
-create_word_file(no_of_ltr)
-print(pick_word(file_name,dif_lvl))
+dif_lvl = "hard"
+
+file = open_word_file(no_of_ltr,dif_lvl)
+print(pick_word(file))
 
 hint_lst = hints(guess_word,wordle_word)
 print(hint_lst)
-'''
+
