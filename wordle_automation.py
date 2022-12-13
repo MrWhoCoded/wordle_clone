@@ -32,7 +32,7 @@ def open_word_file(no_of_ltr,dif_lvl):
         print("h")
 
 
-    return file
+    return file,all_words
 
     
             
@@ -55,8 +55,10 @@ def pick_word(file):
 
     #to pick a random number in the range of 0 to total words with required lenght
     random_num = random.randint(0, len(lst_words))
+    
     #word to guess-
-    wordle_word = lst_words[random_num].lower()
+    #strip function is used to remove undercarriage. 
+    wordle_word = lst_words[random_num].strip()
 
     file.close()
     return wordle_word
@@ -96,8 +98,12 @@ no_of_ltr = '7'
 guess_word = "alter"
 dif_lvl = "hard"
 
-file = open_word_file(no_of_ltr,dif_lvl)
+
+file,all_words = open_word_file(no_of_ltr,dif_lvl)
 print(pick_word(file))
+
+meaning = all_words[wordle_word]
+print(meaning)
 
 hint_lst = hints(guess_word,wordle_word)
 print(hint_lst)
