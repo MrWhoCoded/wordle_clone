@@ -34,14 +34,6 @@ def open_word_file(no_of_ltr,dif_lvl):
 
     return file
 
-    
-            
-
-
-
-
-
-
 #to pick a random word from word file
 def pick_word(file):
     global  wordle_word, common_words
@@ -84,27 +76,4 @@ def hints(guess_word,wordle_word):
 
 
     return hint_lst
-
-
-
-
-#inputs
-#no_of_ltr - number of letters in the word
-#guess_word - word guessed by user
-
-
-
-no_of_ltr = '7'
-guess_word = "alter"
-dif_lvl = "hard"
-
-
-#file,all_words = open_word_file(no_of_ltr,dif_lvl)
-#print(pick_word(file))
-
-#meaning = all_words[wordle_word]
-#print(meaning)
-
-#hint_lst = hints(guess_word,wordle_word)
-#print(hint_lst)
 
