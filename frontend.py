@@ -1,48 +1,81 @@
-from tkinter import *
+from tkinter import *       
 from tkinter import ttk
-import csv
+import csv              #needed for the geometry of boxes
 import wordle_automation
-import os, sys
 
 complete_attempt_word = ""
 hints = []
 counter = 0
 attempt_words = []
 
-def window_switcher():
-    global row, attempt_word, wordle_word, complete_attempt_words, complete_attempt_word
+def window_switcher(): 
+    """
+    Switches start to the main game window and picks a random word for the specified
+    difficulty and no of letters
+    """
+    global row, attempt_word, wordle_word, complete_attempt_words, complete_attempt_word, difficulty
     attempt_word = ""
     complete_attempt_words = []
     complete_attempt_word = ""
     row = [1]
-    wordle_automation.create_word_file(no_of_words.get())
-    wordle_word = wordle_automation.pick_word(wordle_automation.file_name)
+    wordle_word = wordle_automation.pick_word(wordle_automation.open_word_file(no_of_words.get(), difficulty.get()))
     print(wordle_word)
     window.destroy()
     _game_window()
 
 def attempt_cleaner():
+    """
+    Generates the word entered by the user in the input boxes, proceeds only if all the inputs are alphabets
+    and not special symbols or numbers
+    Stores all the attempts
+    """
     global attempt_word, entries, attempt_words, complete_attempt_words, complete_attempt_word
     complete_attempt_word = ""
     for entry in entries:
         if len(entry.get()) != 0:
-            complete_attempt_word += entry.get().lower()
-            attempt_word = complete_attempt_word[-(no_of_words.get()):]
-            attempt_words = list(attempt_word)
-            complete_attempt_words.append(attempt_word)
+            if entry.get().isalpha():
+                complete_attempt_word += entry.get().lower()
+                attempt_word = complete_attempt_word[-(no_of_words.get()):]
+                attempt_words = list(attempt_word)
+            else:
+                complete_attempt_word = ""
+                attempt_word = ""
+                attempt_words = None
+                return 
+    complete_attempt_words.append(attempt_words)
+    print(complete_attempt_words)
+    print(attempt_words)
     
 def attempt_verify():
+    """
+    Verifies if the attempted word by the user is correct and gets the flag for each letter in the
+    word attempted by the user in form of a list
+    """
     global attempt_word, hints, entries
     attempt_cleaner()
     
-    hint = wordle_automation.hints(attempt_word, wordle_word)
-    hints.append(hint)
-    
-    entry_disable(row)
+    if len(attempt_word)>0 and len(attempt_word) == no_of_words.get():
+        hint = wordle_automation.hints(attempt_word, wordle_word)
+        hints.append(hint)
+        
+        entry_disable(row)
+    else:
+        pass
     
                     
 def entry_disable(row):
-    global complete_attempt_word, counter
+    """
+    Disables the rows by coulouring them based on the flag for each letter
+    0 - grey, The letter doesn't exist in the word
+    -1 - yellow, The letter is present at the wrong position in the word
+    1 - green, The letter is presebt at the correct postion in the word
+    
+    sets the label text for the game over window 
+    updates the no of games won in the games_won.txt if the attempted word by the user mathces with the word to be guessed
+    """
+    global complete_attempt_word, counter, status, label_text
+    status = 0
+    label_text = "You Lost"
     if set(hints[-1]) == {1}:
         print("you won")
         disable_hint_list = [0, 0, 0, 0, 0]
@@ -52,10 +85,11 @@ def entry_disable(row):
             hints.append(disable_hint_list)
             complete_attempt_words.append(disable_words)
         
-        with open("games_won.txt", "r+") as file:
-            content = file.read()
+        with open("games_won.txt", "r+", encoding = "utf-8") as file:
+            content = file.read().rstrip("\n")
+            score = int(content.replace("\x00", "")) + 1
             file.truncate(0)
-            file.write(str(int(content) + 1))
+            file.write(str(score))
         
         for x in range(1, no_of_words.get() + 1):
             for y in range(1, no_of_words.get() + 1):
@@ -71,6 +105,9 @@ def entry_disable(row):
                     attempt_box.config(disabledbackground = "grey")
                 
                 attempt_box.config(state = DISABLED)
+        label_text = "You won"
+        game_over()
+        
                 
     else: 
         if (row[-1]+1) < no_of_words.get() + 1:    
@@ -98,14 +135,16 @@ def entry_disable(row):
 def give_up():
     quit()
     
-def play_again():
-    os.execv(sys.executable, ['python'] + sys.argv)
-    
 def game_over():
+    """
+    Displayed when the user runs out of attempts or the attempted word matches the word to be guessed
+    """
+    global label_text
     
     game_over_window = Tk()
     
     game_over_window.geometry("180x160")
+    game_over_window.iconbitmap("Wordle_2021_Icon.ico")
     
     dummy4 = Label(game_over_window, text = "     ")
     dummy4.grid(row = 0, column = 0)
@@ -113,20 +152,22 @@ def game_over():
     dummy5 = Label(game_over_window, text = "     ")
     dummy5.grid(row = 1, column = 1)
     
-    lost = Label(game_over_window, text = "YOU LOST!", font = ('Arial', 12, "bold"))
-    lost.grid(row = 2, column = 2)
+    lost = Label(game_over_window, text = label_text, font = ('Arial', 15, "bold"))
+    lost.grid(row = 2, column = 2, pady = 2)
     
-    play_again_button = Button(game_over_window, text = "Play again", command = play_again)
-    play_again_button.grid(row = 3, column = 2)
-    
-    quit_button = Button(game_over_window, text = "quit", command = give_up)
+    quit_button = Button(game_over_window, text = "quit", font = ('Arial', 13, "bold"), command = give_up, height = 1, width = 5)
     quit_button.grid(row = 4, column = 2)
     
     game_over_window.mainloop()
 
 def start_window():
+    """
+    Displayed when the used starts the game, prompts for the difficulty level and no of words that the user prefers
+    By defailt, the no of letters in the word is 4 and difficulty is easy
+    contains a button named starts the game with the prefered preferences
+    """
 
-    global window, no_of_words, complete_attempt_word, hints, counter, attempt_words
+    global window, no_of_words, complete_attempt_word, hints, counter, attempt_words, difficulty
     
     complete_attempt_word = ""
     hints = []
@@ -136,10 +177,9 @@ def start_window():
     window = Tk()
 
     window.title("Wordle")
-    window.geometry("250x180")
+    window.geometry("250x220")
     
-    photo = PhotoImage(file = "Wordle_2021_Icon.png")
-    window.iconphoto(False, photo)
+    window.iconbitmap("Wordle_2021_Icon.ico")
 
     wordle_label = Label(window, text = "Wordle")
     wordle_label.grid(row = 1, column = 3)
@@ -148,15 +188,26 @@ def start_window():
     no_of_words_label = Label(window, text = "No_of_words")
     no_of_words_label.grid(row = 2, column = 3)
     no_of_words_label.config(font=('Helvatical bold',15))
-
+    
+    difficulty_label = Label(window, text = "Difficulty")
+    difficulty_label.grid(row = 4, column = 3)
+    difficulty_label.config(font=('Helvatical bold',15))
+    
     no_of_words = IntVar()
     no_of_words_choosen = ttk.Combobox(window, width = 10, textvariable = no_of_words)
     no_of_words_choosen["values"] = tuple([i for i in range(4, 8, 1)])
     no_of_words_choosen.grid(row = 3, column = 3)
-    no_of_words_choosen.current()
+    no_of_words_choosen.current(0)
+    
+    difficulty_levels = ["easy", "medium", "hard"]
+    difficulty = StringVar()
+    difficulty_choosen = ttk.Combobox(window, width = 10, textvariable = difficulty)
+    difficulty_choosen["values"] = tuple(difficulty_levels)
+    difficulty_choosen.grid(row = 5, column = 3)
+    difficulty_choosen.current(0)
 
     start_button = Button(window, text = "Start", width = 10, command = window_switcher)
-    start_button.grid(row = 4, column = 3)
+    start_button.grid(row = 6, column = 3)
 
     dummy1 = Label(window, text = "           ")
     dummy1.grid(row = 0, column = 0)
@@ -170,7 +221,13 @@ def start_window():
     window.mainloop()
 
 def _game_window():
-    
+    """
+    Displayed after the start window, This is the main game window
+    The entry boxes for each letter are created using a loop and a single object handles all of them
+    gets the geometry for boxes with different no of letters from the geometry.csv file
+    displays the no of games won
+    the attempt button verfies the word entered by the user and the give up button quits the whole program
+    """
     global entries, attempt_box, game_window, attempt, games_won
 
     #print(no_of_words.get())
@@ -187,15 +244,15 @@ def _game_window():
         height = dimensions[no_of_words.get() - 3][1]
         
     with open("games_won.txt", "r") as file:
-        content = file.read()
-        high_score = "".join(content.split())
+        content = file.read().rstrip("\n")
+        content = int(content.replace("\x00", ""))
+        print(content)
 
     game_window = Tk()
     game_window.title("Wordle")
     game_window.geometry("{}x{}".format(width, height))
     
-    photo = PhotoImage(file = "Wordle_2021_Icon.png")
-    game_window.iconphoto(False, photo)
+    game_window.iconbitmap("Wordle_2021_Icon.ico")
     
     header = Label(game_window, text = "You have {} attempts!".format(no_of_words.get()), width = 16, font = ('Arial',14))
     header.grid(row = 0, column = 2, pady = 5, columnspan = 4)
@@ -207,14 +264,13 @@ def _game_window():
             attempt_box.grid(row = x, column = y, padx = 2, pady = 2)
             entries.append(attempt_box)
     
-    
     give_up_button = Button(game_window, text = "Quit", width = 7, font = ('Arial',13), command = give_up)
     give_up_button.grid(row = 7 + (no_of_words.get() - 2), column = no_of_words.get() - 1, padx = 2, pady = 1, columnspan = 2)
     
     attempt_button = Button(game_window, text = "attempt", width = 7, font = ('Arial',13), command = attempt_verify)
     attempt_button.grid(row = 7 + (no_of_words.get() - 2), column = 1, padx = 2, pady = 1, columnspan = 2)
     
-    games_won = Label(game_window, text = "games won:{}".format(high_score), font = ('Arial',12))
+    games_won = Label(game_window, text = "games won:{}".format(content), font = ('Arial',13))
     games_won.grid(row = 8 + (no_of_words.get() - 2), column = 1, padx = 2, pady = 1, columnspan = 3)
     
     dummy1 = Label(game_window, text = "           ")
