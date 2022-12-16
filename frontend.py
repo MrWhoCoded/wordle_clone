@@ -61,8 +61,7 @@ def attempt_verify():
         entry_disable(row)
     else:
         pass
-    
-                    
+          
 def entry_disable(row):
     """
     Disables the rows by coulouring them based on the flag for each letter
@@ -108,7 +107,6 @@ def entry_disable(row):
         label_text = "You won"
         game_over()
         
-                
     else: 
         if (row[-1]+1) < no_of_words.get() + 1:    
             for x in range(1, (row[-1]+1)):
