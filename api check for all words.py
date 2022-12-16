@@ -17,9 +17,6 @@ def sort_word(word,val):
         with open("hard_" + file_name, "a") as fl_hard:
             fl_hard.write(word)
 
-
-
-    
 dummmy_dict = {}
 #to send api request to google trends api to find the frequency of word usage.
 for no_of_ltr in range(5,8):
@@ -31,7 +28,6 @@ for no_of_ltr in range(5,8):
     with open(file_name,'r+', encoding='utf-8') as word_file:
         all_words = word_file.readlines()
 
-
     #to establish the connection between pytrends and google trends.
     pytrends = TrendReq(hl='en-US', tz=360)
             
@@ -41,7 +37,6 @@ for no_of_ltr in range(5,8):
     print(len_lst)
     
     while index < 200: #len starts from 1 and index starts from 0.
-        
 
         try:
             #var to keep count
@@ -52,7 +47,6 @@ for no_of_ltr in range(5,8):
             #building payload which will be queried to google trends.(queries all words through the list)
             pytrends.build_payload(word_lst, timeframe='today 12-m') 
 
-            
             #sending request to google trends
             data = pytrends.interest_over_time()
             #print('date',data)
@@ -76,17 +70,11 @@ for no_of_ltr in range(5,8):
 
             sort_word(word,val)
 
-    
-
-            
         except Exception:
             #traceback.print_exc()
             word_lst = []
             time.sleep(2)
             
-
         #index does not chage so word is repeated. 
             
-
-print(dummmy_dict)        
-                             
+print(dummmy_dict)            
